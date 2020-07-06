@@ -1,0 +1,26 @@
+#
+# https://github.com/IBM/tekton-tutorial/blob/beta-update/tekton/run/picalc-pipeline-run.yaml
+#
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: webapl
+spec:
+  pipelineRef:
+    name: build-and-deploy-pipeline
+  params:
+    - name: gitUrl
+      value: https://github.com/takara9/web-nginx
+    - name: pathToContext
+      value: .
+    - name: pathToYamlFile
+      value: "kubernetes/web-nginx.yaml"
+    - name: imageUrl
+      value: jp.icr.io/takara/web-nginx
+    - name: imageTag
+      value: "1.0"
+  serviceAccountName: pipeline-account
+  workspaces:
+    - name: git-source
+      persistentVolumeClaim:
+        claimName: workspace-source-pvc

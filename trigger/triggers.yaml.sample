@@ -1,0 +1,65 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: cicd-triggertemplate
+spec:
+  params:
+    - name: gitrevision
+      description: The git revision
+      default: master
+    - name: gitrepositoryurl
+      description: The git repository url
+    - name: namespace
+      description: The namespace to create the resources
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        name: webapl-pipeline-run-$(uid)
+      spec:
+        pipelineRef:
+          name: build-and-deploy-pipeline
+        params:
+          - name: gitUrl
+            value: https://github.com/takara9/web-nginx
+          - name: gitRevision
+            value: master
+          - name: pathToContext
+            value: .
+          - name: pathToYamlFile
+            value: "kubernetes/web-nginx.yaml" # Gitに実在するファイル
+          - name: imageUrl
+            value: jp.icr.io/takara/web-nginx  # イメージリポジトリ
+          - name: imageTag
+            value: 1.1-$(uid)
+        serviceAccountName: pipeline-account
+        workspaces:
+          - name: git-source
+            persistentVolumeClaim:
+              claimName: workspace-source-pvc
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: cicd-pipelinebinding
+spec:
+  params:
+    - name: gitrevision
+      value: $(body.head_commit.id)
+    - name: namespace
+      value: cicd      # 名前空間の設定は必須
+    - name: gitrepositoryurl
+      value: "https://github.com/$(body.repository.full_name)"
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: cicd-listener
+  namespace: cicd      # 名前空間の設定は必須
+spec:
+  serviceAccountName: tekton-triggers-admin
+  triggers:
+    - bindings:
+      - ref: cicd-pipelinebinding
+      template:
+        name: cicd-triggertemplate

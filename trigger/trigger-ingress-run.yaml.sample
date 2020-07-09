@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: create-ingress-run
+spec:
+  taskRef:
+    name: create-ingress
+  params:
+  - name: CreateCertificate
+    value: "false"
+  - name: CertificateKeyPassphrase
+    value: asecretphrase
+  - name: CertificateSecretName
+    value: "ic ks cluster get -c クラスタ名" で得られる「Ingress の秘密」の値をセット
+  - name: ExternalDomain
+    value: "ic ks cluster get -c クラスタ名" で得られる「Ingress サブドメイン」の値をセット
+  - name: Service
+    value: el-cicd-listener
+  - name: ServicePort
+    value: "8080"
+  timeout: 1000s
+  serviceAccountName: tekton-triggers-createwebhook

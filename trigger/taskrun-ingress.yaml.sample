@@ -1,10 +1,10 @@
 apiVersion: tekton.dev/v1beta1
 kind: TaskRun
 metadata:
-  name: create-ingress-run
+  name: task-ingress-run
 spec:
   taskRef:
-    name: create-ingress
+    name: task-ingress
   params:
   - name: CreateCertificate
     value: "false"

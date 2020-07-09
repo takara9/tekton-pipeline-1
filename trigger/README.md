@@ -4,8 +4,8 @@
 サービスアカウントとアクセス権限の追加
 
 ~~~
-kubectl apply -f trigger-admin-role.yaml
-kubectl apply -f trigger-webhook-role.yaml
+kubectl apply -f rabc-trigger.yaml
+kubectl apply -f rbac-webhook.yaml
 ~~~
 
 トリガーの設定で、利用者自身のカスタマイズやパイプラインの変更などは、このファイルに実施する
@@ -17,15 +17,15 @@ kubectl apply -f triggers.yaml
 イベントリスナーに必要なタスクを設定する。
 
 ~~~
-kubectl apply -f trigger-create-ingress.yaml
-kubectl apply -f trigger-create-webhook.yaml
+kubectl apply -f task-ingress.yaml
+kubectl apply -f task-webhook.yaml
 ~~~
 
 イングレスを起動して、クラスター外からリクエストを受けられるようにする。
 以下の例は、Classic Infrastructure 上のKubernetesでの例であるが、VPC上でも同じ。
 
 ~~~
-kubectl apply -f trigger-ingress-run.yaml
+kubectl apply -f taskrun-ingress.yaml
 
 kubectl get ing
 NAME               HOSTS                                                                                       ADDRESS   PORTS     AGE
@@ -35,13 +35,13 @@ el-cicd-listener   k8s-classic-tok04-dd3a245ee37e0f22836f16bc6000a054-0000.jp-to
 GitHubで生成したトークンと、TektonとGitHubで共有する文字列であるシークレット
 
 ~~~
-kubectl apply -f trigger-secret-github.yaml
+kubectl apply -f secret-github.yaml
 ~~~
 
 GitHubのユーザーなど、WebHookを飛ばしてくる元の情報をセット
 
 ~~~
-kubectl apply -f trigger-webhook-run.yaml
+kubectl apply -f taskrun-webhook.yaml
 ~~~
 
 
